@@ -25,6 +25,9 @@ Logger 日志器 1.提供打印日志的方法 2.设置日志输出的路径
 
 */
 #include <string>
+#include <queue>
+#include <memory>
+
 
 
 #ifndef WROCKET_COMMON_LOG_H
@@ -53,8 +56,11 @@ enum LogLevel {
      Error = 3
 };
 
+std::string LogLevelToString(LogLevel level);
+
 class LogEvent {
 public:
+     LogEvent(LogLevel level): m_level(level){}
 
      std::string getFileName() const {
           return m_file_name;
@@ -64,7 +70,7 @@ public:
           return m_level;
      }
 
-     void printLog();
+     std::string toString();
 
 private:
      std::string m_file_name; // 文件名
@@ -77,7 +83,27 @@ private:
 };
 
 
+class Logger {
+public:
+     typedef std::shared_ptr<Logger> s_ptr;
+
+     
+     
+     Logger* GetGlobalLogger();
+
+     void pushLog(const std::string& msg);
+
+     void log();
+private:
+     LogLevel m_set_level;
+     
+     std::queue<std::string> m_buffer;
+};
+
 }
+
+
+
 
 
 #endif
