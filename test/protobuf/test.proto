@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package fixbug;
+
+//数据 列表 映射表
+//定义登录请求类型 
+message LoginRequest
+{
+     bytes name = 1;
+     bytes pwd = 2;
+} 
+
+
+message ResultCode
+{
+     int32 errcode = 1;
+     bytes errmsg = 2;
+}
+
+//定义登录响应消息类型
+message LoginResponse 
+{
+     ResultCode result = 1;
+     bool success = 2;
+}
+
+message User
+{
+     bytes name = 1;
+     uint32 age = 2;
+     enum Sex 
+     {
+          MAN = 0;
+          WOMAN = 1;
+     }
+     Sex sex = 3;
+}
+
+message GetFriendListsResponse 
+{
+     ResultCode result = 1;
+     repeated User friend_list = 2;
+}
+
+
+// 在protobuf里面怎么定义描述rpc方法的类型 -service
