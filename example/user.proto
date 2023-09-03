@@ -1,0 +1,28 @@
+syntax = "proto3";
+package userdata;
+
+
+option cc_generic_services = true;
+
+message ResultCode
+{
+     int32 errcode = 1;
+     bytes errmsg = 2;
+}
+
+message LoginRequst
+{
+     bytes name = 1;
+     bytes pwd = 2;
+}
+
+message LoginResponse
+{
+     ResultCode result = 1;
+     bool sucess = 2;
+}
+
+service UserServiceRpc
+{
+     rpc Login(LoginRequst) returns(LoginResponse);
+}

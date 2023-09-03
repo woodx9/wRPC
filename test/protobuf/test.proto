@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package fixbug;
 
+// 定义下面的选项，表示生成service服务器类和rpc描述方法，默认不生成
+option cc_generic_services = true;
+
 //数据 列表 映射表
 //定义登录请求类型 
 message LoginRequest
@@ -15,6 +18,11 @@ message ResultCode
 {
      int32 errcode = 1;
      bytes errmsg = 2;
+}
+
+message GetFriendListsRequest
+{
+     uint32 userid = 1;
 }
 
 //定义登录响应消息类型
@@ -44,3 +52,8 @@ message GetFriendListsResponse
 
 
 // 在protobuf里面怎么定义描述rpc方法的类型 -service
+service   UserServiceRpc
+{
+     rpc Login(LoginRequest) returns(LoginResponse);
+     rpc GetFriendLists(GetFriendListsRequest) returns(GetFriendListsResponse);
+}
