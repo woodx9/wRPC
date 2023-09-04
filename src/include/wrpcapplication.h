@@ -10,7 +10,7 @@ class wRPCApplication
 public:
      static void Init(int argc, char **argv);
      static wRPCApplication& GetInstance();
-
+     static WRpcConfig& GetConfig();
 private: 
      wRPCApplication() {}
      wRPCApplication(const wRPCApplication&) = delete;

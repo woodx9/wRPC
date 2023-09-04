@@ -56,6 +56,11 @@
           "thread": "cpp",
           "cinttypes": "cpp",
           "typeinfo": "cpp",
-          "*.inc": "cpp"
+          "*.inc": "cpp",
+          "list": "cpp",
+          "bitset": "cpp",
+          "complex": "cpp",
+          "typeindex": "cpp",
+          "variant": "cpp"
      }
 }

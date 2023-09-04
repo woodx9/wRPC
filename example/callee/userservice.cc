@@ -43,7 +43,7 @@ public:
           done->Run();
      }
 
-
+     
 
 };
 
@@ -62,8 +62,8 @@ int main(int argc, char **argv)
      provider.Run(); 
 
 
-     UserService us;
-     us.Login("woodx", "123456");
+     // UserService us;
+     // us.Login("woodx", "123456");
 
      return 0;
 }
