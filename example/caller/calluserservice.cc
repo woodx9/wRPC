@@ -25,13 +25,18 @@ int main(int argc, char **argv)
      if (0 == response.result().errcode())
      {
           std::cout << "rpc login response success:" << response.sucess() << std::endl;
+          std::cout << "error_code: " << response.result().errcode() << std::endl;
+          std::cout << "error_msg: " << response.result().errmsg() << std::endl;
      }
      else
      {
           std::cout << "rpc login response error : " << response.result().errmsg() << std::endl;
      }       
 
+     /* 
+     24 10
 
+     */
                     
 
      return 0;

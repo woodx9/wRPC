@@ -16,7 +16,7 @@ public:
      bool Login(std::string name, std::string pwd) {
           std::cout << "doing local service: Login" << std::endl;
           std::cout << "name: " << name << " pwd:" << pwd << std::endl;
-          return true;
+          return 1;
      }
 
      // 重写UserServiceRpc的虚函数，下面这些方法都是给框架直接调用的
@@ -35,7 +35,7 @@ public:
           // 把响应写入，包括错误码，错误消息，返回值
           userdata::ResultCode * code = response->mutable_result();
           code->set_errcode(0);
-          code->set_errmsg("no error");
+          code->set_errmsg("some thing is wrong");
 
           response->set_sucess(login_result);
 
