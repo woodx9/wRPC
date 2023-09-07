@@ -1,7 +1,7 @@
 #include <iostream>
 #include "wrpcapplication.h"
 #include "user.pb.h"
-#include "wrpcchannel.h"
+
 
 
 int main(int argc, char **argv) 
@@ -19,9 +19,20 @@ int main(int argc, char **argv)
      // rpc方法的响应
      userdata::LoginResponse response;
      // 发起rpc方法的调用  同步的rpc调用过程  MprpcChannel::callmethod
-     stub.Login(nullptr, &request, &response, nullptr); // RpcChannel->RpcChannel::callMethod 集中来做所有rpc方法调用的参数序列化和网络发送
+
+
+     WRpcController controller;
+     stub.Login(&controller, &request, &response, nullptr); // RpcChannel->RpcChannel::callMethod 集中来做所有rpc方法调用的参数序列化和网络发送
+
+     // 通过controller来查看rpc调用过程中是否发生错误
+     if (controller.Failed()) 
+     {
+          std::cout << controller.ErrorText() << std::endl;
+          return 0;
+     } 
 
      // 一次rpc调用完成，读调用的结果
+
      if (0 == response.result().errcode())
      {
           std::cout << "rpc login response success:" << response.sucess() << std::endl;

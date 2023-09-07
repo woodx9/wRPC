@@ -26,7 +26,7 @@ void WRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
      }
      else 
      {
-          std::cout << "args serialize request error!" <<  std::endl;
+          controller->SetFailed("args serialize request error!");
           return;
      }
 
@@ -44,7 +44,7 @@ void WRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
      }
      else 
      {
-          std::cout << "args serialize rpc header error!" <<  std::endl;
+          controller->SetFailed("args serialize rpc header error!");
           return;
      }
 
@@ -60,7 +60,7 @@ void WRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
      int clientfd = socket(AF_INET, SOCK_STREAM, 0);
      if (-1 == clientfd)
      {
-          std::cout << "create socket error! error:" << errno << std::endl;
+          controller->SetFailed("create socket error! error:" + errno);
           exit(EXIT_FAILURE);
      }
 
@@ -75,14 +75,14 @@ void WRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
      // 连接rpc服务器节点
      if (connect(clientfd, (struct sockaddr*)&server_adder, sizeof(server_adder)))
      {
-          std::cout << "connect error! errno: " << errno << std::endl;
+          controller->SetFailed("connect error! errno: " + errno);
           exit(EXIT_FAILURE);
      }
      
      // 发送rpc请求
      if (send(clientfd, send_rpc_str.c_str(), send_rpc_str.size(), 0) == -1)
      {
-          std::cout << "send error! errno: " << errno << std::endl;
+          controller->SetFailed("send error! errno: " + errno);
           close(clientfd);
           return;
      }
@@ -92,7 +92,7 @@ void WRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
      int recv_size = 0;
      if ((recv_size = recv(clientfd, &recv_buf, 1024, 0)) == -1)
      {
-          std::cout << "recv error! errno: " << errno << std::endl;
+          controller->SetFailed("recv error! errno: " + errno);
           close(clientfd);
           return;
      }

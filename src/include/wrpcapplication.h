@@ -2,6 +2,8 @@
 
 // wrpc框架的初始化基础类
 #include "wrpcconfig.h"
+#include "wrpcchannel.h"
+#include "wrpccontroller.h"
 
 class wRPCApplication 
 {
