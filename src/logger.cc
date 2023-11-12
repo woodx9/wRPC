@@ -27,7 +27,11 @@ Logger::Logger()
                std::string msg = m_safQue.Pop();
 
                char time_buf[128] = {0};
-               sprintf(time_buf, "%d:%d:%d =>", nowtm->tm_hour, nowtm->tm_min, nowtm->tm_sec);
+               sprintf(time_buf, "%d:%d:%d => [%s]", 
+                                   nowtm->tm_hour, 
+                                   nowtm->tm_min, 
+                                   nowtm->tm_sec,
+                                   (m_LogLevel == INFO ? "INFO" : "ERROR"));
                msg.insert(0, time_buf);
 
                fputs(msg.c_str(), pf);

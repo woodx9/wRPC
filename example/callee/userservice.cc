@@ -3,6 +3,7 @@
 #include "user.pb.h"
 #include "wrpcapplication.h"
 #include "rpcprovider.h"
+#include "logger.h"
 
 
 /*
@@ -29,8 +30,14 @@ public:
           std::string name = request->name();
           std::string pwd = request->pwd();
 
+          LOG_INFO("name: %s pwd: %s ", name.c_str(), pwd.c_str());
+
           // 本地实际函数调用
           bool login_result = Login(name, pwd);
+
+          if (!login_result) {
+               LOG_INFO("CALL FAILED");
+          }
 
           // 把响应写入，包括错误码，错误消息，返回值
           userdata::ResultCode * code = response->mutable_result();
@@ -50,6 +57,8 @@ public:
 
 int main(int argc, char **argv) 
 {
+     
+
      // 调用框架的初始化操作 provider -i config.conf
      wRPCApplication::Init(argc, argv);
 

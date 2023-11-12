@@ -31,24 +31,31 @@ private:
 
 
 // 定义宏
-#define LOG_INFO(logmsgformat, ...) \
+#define LOG_INFO(logmsgformat, ...)     \
      do \
-     { \
+     {  \
           Logger &logger = Logger::GetInstance(); \
-          logger.SetLoglevle(INFO); \
+          logger.SetLogLevel(INFO); \
           char c[1024] = {0}; \
-          snprintf(c, 1024, logmsgformat, ##_VA_ARGS__); \
-          Logger.Log(c); \
-     } while({0});
+          snprintf(c, 1024, logmsgformat, ##__VA_ARGS__); \
+          std::string str(c); \
+          str += '\n'; \
+          logger.Log(str); \
+     } while(0);
 
 
 
-#define LOG_ERR(logmsgformat, ...) \
+#define LOG_ERR(logmsgformat, ...)      \
      do \
-     { \
+     {  \
           Logger &logger = Logger::GetInstance(); \
-          logger.SetLoglevle(ERROR); \
+          logger.SetLogLevel(ERROR); \
           char c[1024] = {0}; \
-          snprintf(c, 1024, logmsgformat, ##_VA_ARGS__); \
-          Logger.Log(c); \
-     } while({0});
+          snprintf(c, 1024, logmsgformat, ##__VA_ARGS__); \
+          std::string str(c); \
+          str += '\n'; \
+          logger.Log(str); \
+     } while(0);
+
+
+     
