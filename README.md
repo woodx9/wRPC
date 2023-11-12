@@ -1,13 +1,13 @@
 ### 项目目录结构
-bin：可执行文件
-build：项目编译文件
-lib：项目库文件
-src：源文件
-test：测试代码
-img: readme图片
-example：框架代码使用范例
-CMakeLists.txt：顶层的cmake文件
-README.md：项目自述文件
+- bin：可执行文件
+- build：项目编译文件
+- lib：项目库文件
+- src：源文件
+- test：测试代码
+- img: readme图片
+- example：框架代码使用范例
+- CMakeLists.txt：顶层的cmake文件
+- README.md：项目自述文件
 
 
 
@@ -31,9 +31,9 @@ Wrpc/bin$ ./provider -i test.conf
 ```
 
 ### 应用第三方库版本
-muduo v2.0.2
-zookeeper 3.6.3
-protobuffer 3.12.2
+- muduo v2.0.2
+- zookeeper 3.6.3
+- protobuffer 3.12.2
 
 
 ### 调用过程详解：
