@@ -15,6 +15,7 @@
 
 #include <error.h>
 #include "wrpcapplication.h"
+#include "zookeeperutil.h"
 
 
 class WRpcChannel: public google::protobuf::RpcChannel

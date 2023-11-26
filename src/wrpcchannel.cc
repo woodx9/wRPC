@@ -56,54 +56,97 @@ void WRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
      send_rpc_str += args_str;
 
 
-     // 使用tcp编程，完成rpc方法的远程调用
-     int clientfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (-1 == clientfd)
-     {
-          controller->SetFailed("create socket error! error:" + errno);
-          exit(EXIT_FAILURE);
-     }
+     // 打印调试信息
+    std::cout << "============================================" << std::endl;
+    std::cout << "header_size: " << header_size << std::endl; 
+    std::cout << "rpc_header_str: " << rpc_header_str << std::endl; 
+    std::cout << "service_name: " << service_name << std::endl; 
+    std::cout << "method_name: " << method_name << std::endl; 
+    std::cout << "args_str: " << args_str << std::endl; 
+    std::cout << "============================================" << std::endl;
 
-     std::string ip = wRPCApplication::GetInstance().GetConfig().Load("rpcserverip");
-     uint32_t port = atoi(wRPCApplication::GetInstance().GetConfig().Load("rpcserverport").c_str());
+    // 使用tcp编程，完成rpc方法的远程调用
+    int clientfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (-1 == clientfd)
+    {
+        char errtxt[512] = {0};
+        sprintf(errtxt, "create socket error! errno:%d", errno);
+        controller->SetFailed(errtxt);
+        return;
+    }
 
-     struct sockaddr_in server_adder;
-     server_adder.sin_family = AF_INET;
-     server_adder.sin_port = htons(port);
-     server_adder.sin_addr.s_addr = inet_addr(ip.c_str());
+    // 读取配置文件rpcserver的信息
+    // std::string ip = MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
+    // uint16_t port = atoi(MprpcApplication::GetInstance().GetConfig().Load("rpcserverport").c_str());
+    // rpc调用方想调用service_name的method_name服务，需要查询zk上该服务所在的host信息
+    ZkClient zkCli;
+    zkCli.Start();
+    //  /UserServiceRpc/Login
+    std::string method_path = "/" + service_name + "/" + method_name;
+    // 127.0.0.1:8000
+    std::string host_data = zkCli.GetData(method_path.c_str());
+    if (host_data == "")
+    {
+        controller->SetFailed(method_path + " is not exist!");
+        return;
+    }
+    int idx = host_data.find(":");
+    if (idx == -1)
+    {
+        controller->SetFailed(method_path + " address is invalid!");
+        return;
+    }
+    std::string ip = host_data.substr(0, idx);
+    uint16_t port = atoi(host_data.substr(idx+1, host_data.size()-idx).c_str()); 
 
-     // 连接rpc服务器节点
-     if (connect(clientfd, (struct sockaddr*)&server_adder, sizeof(server_adder)))
-     {
-          controller->SetFailed("connect error! errno: " + errno);
-          exit(EXIT_FAILURE);
-     }
-     
-     // 发送rpc请求
-     if (send(clientfd, send_rpc_str.c_str(), send_rpc_str.size(), 0) == -1)
-     {
-          controller->SetFailed("send error! errno: " + errno);
-          close(clientfd);
-          return;
-     }
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(port);
+    server_addr.sin_addr.s_addr = inet_addr(ip.c_str());
 
-     // 接收rpc请求的响应值
-     char recv_buf[1024] = {};
-     int recv_size = 0;
-     if ((recv_size = recv(clientfd, &recv_buf, 1024, 0)) == -1)
-     {
-          controller->SetFailed("recv error! errno: " + errno);
-          close(clientfd);
-          return;
-     }
+    // 连接rpc服务节点
+    if (-1 == connect(clientfd, (struct sockaddr*)&server_addr, sizeof(server_addr)))
+    {
+        close(clientfd);
+        char errtxt[512] = {0};
+        sprintf(errtxt, "connect error! errno:%d", errno);
+        controller->SetFailed(errtxt);
+        return;
+    }
 
-     std::string response_str(recv_buf, 0, recv_size);
-     if (response->ParseFromString(response_str) == -1)
-     {
-          std::cout << "parse error! response_str: " << recv_buf << std::endl;
-          close(clientfd);
-          return;
-     }
+    // 发送rpc请求
+    if (-1 == send(clientfd, send_rpc_str.c_str(), send_rpc_str.size(), 0))
+    {
+        close(clientfd);
+        char errtxt[512] = {0};
+        sprintf(errtxt, "send error! errno:%d", errno);
+        controller->SetFailed(errtxt);
+        return;
+    }
 
-     close(clientfd);
+    // 接收rpc请求的响应值
+    char recv_buf[1024] = {0};
+    int recv_size = 0;
+    if (-1 == (recv_size = recv(clientfd, recv_buf, 1024, 0)))
+    {
+        close(clientfd);
+        char errtxt[512] = {0};
+        sprintf(errtxt, "recv error! errno:%d", errno);
+        controller->SetFailed(errtxt);
+        return;
+    }
+
+    // 反序列化rpc调用的响应数据
+    // std::string response_str(recv_buf, 0, recv_size); // bug出现问题，recv_buf中遇到\0后面的数据就存不下来了，导致反序列化失败
+    // if (!response->ParseFromString(response_str))
+    if (!response->ParseFromArray(recv_buf, recv_size))
+    {
+        close(clientfd);
+        char errtxt[512] = {0};
+        sprintf(errtxt, "parse error! response_str:%s", recv_buf);
+        controller->SetFailed(errtxt);
+        return;
+    }
+
+    close(clientfd);
 }
